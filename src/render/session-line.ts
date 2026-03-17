@@ -154,7 +154,9 @@ export function renderSessionLine(ctx: RenderContext): string {
       const effectiveUsage = Math.max(fiveHour ?? 0, sevenDay ?? 0);
 
       if (effectiveUsage >= usageThreshold) {
-        const syncingSuffix = '';
+        const syncingSuffix = (!ctx.usageData.planName && ctx.usageData.apiError === 'rate-limited')
+          ? ` ${dim('(syncing...)')}`
+          : '';
         const fiveHourDisplay = formatUsagePercent(fiveHour, colors);
         const fiveHourReset = formatResetTime(ctx.usageData.fiveHourResetAt);
 
