@@ -23,7 +23,7 @@ export function renderSessionLine(ctx: RenderContext): string {
   }
 
   const colors = ctx.config?.colors;
-  const bar = coloredBar(percent, 10, colors);
+  const bar = coloredBar(percent, 5, colors);
 
   const parts: string[] = [];
   const display = ctx.config?.display;
@@ -37,7 +37,8 @@ export function renderSessionLine(ctx: RenderContext): string {
   const showUsage = display?.showUsage !== false;
   const planName = showUsage ? ctx.usageData?.planName : undefined;
   const hasApiKey = !!process.env.ANTHROPIC_API_KEY;
-  const billingLabel = showUsage ? (planName ?? (hasApiKey ? red('API') : undefined)) : undefined;
+  const hasVertex = !!process.env.CLAUDE_CODE_USE_VERTEX;
+  const billingLabel = planName ?? (hasApiKey ? red('API') : hasVertex ? red('Vertex') : undefined);
   const planDisplay = providerLabel ?? billingLabel;
   const modelDisplay = planDisplay ? `${model} | ${planDisplay}` : model;
 
@@ -54,11 +55,9 @@ export function renderSessionLine(ctx: RenderContext): string {
   // Project path + git status (SECOND)
   let projectPart: string | null = null;
   if (display?.showProject !== false && ctx.stdin.cwd) {
-    // Split by both Unix (/) and Windows (\) separators for cross-platform support
-    const segments = ctx.stdin.cwd.split(/[/\\]/).filter(Boolean);
+    const sourcePath = ctx.gitStatus?.mainRepoPath ?? ctx.stdin.cwd;
+    const segments = sourcePath.split(/[/\\]/).filter(Boolean);
     const pathLevels = ctx.config?.pathLevels ?? 1;
-    // Always join with forward slash for consistent display
-    // Handle root path (/) which results in empty segments
     const projectPath = segments.length > 0 ? segments.slice(-pathLevels).join('/') : '/';
     projectPart = yellow(projectPath);
   }
@@ -98,7 +97,7 @@ export function renderSessionLine(ctx: RenderContext): string {
       }
     }
 
-    gitPart = `${magenta('git:(')}${cyan(gitParts.join(''))}${magenta(')')}`;
+    gitPart = `${magenta('(')}${cyan(gitParts.join(''))}${magenta(')')}`;
   }
 
   if (projectPart && gitPart) {
@@ -164,8 +163,8 @@ export function renderSessionLine(ctx: RenderContext): string {
         const usageBarEnabled = display?.usageBarEnabled ?? true;
         const fiveHourPart = usageBarEnabled
           ? (fiveHourReset
-              ? `${quotaBar(fiveHour ?? 0, 10, colors)} ${fiveHourDisplay} (${fiveHourReset} / 5h)`
-              : `${quotaBar(fiveHour ?? 0, 10, colors)} ${fiveHourDisplay}`)
+              ? `${quotaBar(fiveHour ?? 0, 5, colors)} ${fiveHourDisplay} (${fiveHourReset} / 5h)`
+              : `${quotaBar(fiveHour ?? 0, 5, colors)} ${fiveHourDisplay}`)
           : (fiveHourReset
               ? `5h: ${fiveHourDisplay} (${fiveHourReset})`
               : `5h: ${fiveHourDisplay}`);
@@ -176,8 +175,8 @@ export function renderSessionLine(ctx: RenderContext): string {
           const sevenDayReset = formatResetTime(ctx.usageData.sevenDayResetAt);
           const sevenDayPart = usageBarEnabled
             ? (sevenDayReset
-                ? `${quotaBar(sevenDay, 10, colors)} ${sevenDayDisplay} (${sevenDayReset} / 7d)`
-                : `${quotaBar(sevenDay, 10, colors)} ${sevenDayDisplay}`)
+                ? `${quotaBar(sevenDay, 5, colors)} ${sevenDayDisplay} (${sevenDayReset} / 7d)`
+                : `${quotaBar(sevenDay, 5, colors)} ${sevenDayDisplay}`)
             : (sevenDayReset
                 ? `7d: ${sevenDayDisplay} (${sevenDayReset})`
                 : `7d: ${sevenDayDisplay}`);
