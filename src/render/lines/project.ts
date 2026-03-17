@@ -1,6 +1,6 @@
 import type { RenderContext } from '../../types.js';
 import { getModelName, getProviderLabel } from '../../stdin.js';
-import { cyan, dim, magenta, yellow, red } from '../colors.js';
+import { cyan, dim, magenta, red, yellow } from '../colors.js';
 
 export function renderProjectLine(ctx: RenderContext): string | null {
   const display = ctx.config?.display;
@@ -9,10 +9,9 @@ export function renderProjectLine(ctx: RenderContext): string | null {
   if (display?.showModel !== false) {
     const model = getModelName(ctx.stdin);
     const providerLabel = getProviderLabel(ctx.stdin);
-    const showUsage = display?.showUsage !== false;
-    const planName = showUsage ? ctx.usageData?.planName : undefined;
     const hasApiKey = !!process.env.ANTHROPIC_API_KEY;
-    const billingLabel = showUsage ? (planName ?? (hasApiKey ? red('API') : undefined)) : undefined;
+    const hasVertex = !!process.env.CLAUDE_CODE_USE_VERTEX;
+    const billingLabel = hasApiKey ? red('API') : hasVertex ? red('Vertex') : undefined;
     const planDisplay = providerLabel ?? billingLabel;
     const modelDisplay = planDisplay ? `${model} | ${planDisplay}` : model;
     parts.push(cyan(`[${modelDisplay}]`));
