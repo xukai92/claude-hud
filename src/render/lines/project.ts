@@ -59,7 +59,7 @@ export function renderProjectLine(ctx: RenderContext): string | null {
       }
     }
 
-    gitPart = `${magenta('git:(')}${cyan(gitParts.join(''))}${magenta(')')}`;
+    gitPart = `${magenta('(')}${cyan(gitParts.join(''))}${magenta(')')}`;
   }
 
   if (projectPart && gitPart) {
