@@ -20,7 +20,8 @@ export function renderProjectLine(ctx: RenderContext): string | null {
 
   let projectPart: string | null = null;
   if (display?.showProject !== false && ctx.stdin.cwd) {
-    const segments = ctx.stdin.cwd.split(/[/\\]/).filter(Boolean);
+    const sourcePath = ctx.gitStatus?.mainRepoPath ?? ctx.stdin.cwd;
+    const segments = sourcePath.split(/[/\\]/).filter(Boolean);
     const pathLevels = ctx.config?.pathLevels ?? 1;
     const projectPath = segments.length > 0 ? segments.slice(-pathLevels).join('/') : '/';
     projectPart = yellow(projectPath);
