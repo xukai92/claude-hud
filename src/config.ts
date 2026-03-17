@@ -205,8 +205,8 @@ function migrateConfig(userConfig: Partial<HudConfig> & LegacyConfig): Partial<H
   return migrated;
 }
 
-function validateThreshold(value: unknown, max = 100): number {
-  if (typeof value !== 'number') return 0;
+function validateThreshold(value: unknown, max = 100, defaultValue = 0): number {
+  if (typeof value !== 'number') return defaultValue;
   return Math.max(0, Math.min(max, value));
 }
 
@@ -294,7 +294,7 @@ export function mergeConfig(userConfig: Partial<HudConfig>): HudConfig {
       ? migrated.display.autocompactBuffer
       : DEFAULT_CONFIG.display.autocompactBuffer,
     usageThreshold: validateThreshold(migrated.display?.usageThreshold, 100),
-    sevenDayThreshold: validateThreshold(migrated.display?.sevenDayThreshold, 100),
+    sevenDayThreshold: validateThreshold(migrated.display?.sevenDayThreshold, 100, 80),
     environmentThreshold: validateThreshold(migrated.display?.environmentThreshold, 100),
   };
 
