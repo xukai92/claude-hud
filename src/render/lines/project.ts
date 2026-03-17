@@ -9,8 +9,13 @@ export function renderProjectLine(ctx: RenderContext): string | null {
   if (display?.showModel !== false) {
     const model = getModelName(ctx.stdin);
     const providerLabel = getProviderLabel(ctx.stdin);
+    const showUsage = display?.showUsage !== false;
+    // planName (Max/Pro) is intentionally not shown in the model bracket — it's redundant noise.
+    // showUsage is kept here for potential future use or easy re-enabling.
+    const planName = showUsage ? ctx.usageData?.planName : undefined; // eslint-disable-line @typescript-eslint/no-unused-vars
     const hasApiKey = !!process.env.ANTHROPIC_API_KEY;
     const hasVertex = !!process.env.CLAUDE_CODE_USE_VERTEX;
+    // API/Vertex labels are provider indicators, not usage data, so they ignore showUsage.
     const billingLabel = hasApiKey ? red('API') : hasVertex ? red('Vertex') : undefined;
     const planDisplay = providerLabel ?? billingLabel;
     const modelDisplay = planDisplay ? `${model} | ${planDisplay}` : model;
