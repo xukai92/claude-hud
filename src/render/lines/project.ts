@@ -12,9 +12,9 @@ export function renderProjectLine(ctx: RenderContext): string | null {
     const showUsage = display?.showUsage !== false;
     const planName = showUsage ? ctx.usageData?.planName : undefined;
     const hasApiKey = !!process.env.ANTHROPIC_API_KEY;
-    const hasVertex = !!process.env.CLAUDE_CODE_USE_VERTEX;
-    // Show plan name (Max/Pro) if available, otherwise fall back to API/Vertex provider labels.
-    const billingLabel = planName ?? (hasApiKey ? red('API') : hasVertex ? red('Vertex') : undefined);
+    // Show plan name (Max/Pro) if available, otherwise fall back to API provider label.
+    // Vertex/Bedrock are handled by providerLabel (from getProviderLabel) which takes priority below.
+    const billingLabel = planName ?? (hasApiKey ? red('API') : undefined);
     const planDisplay = providerLabel ?? billingLabel;
     const modelDisplay = planDisplay ? `${model} | ${planDisplay}` : model;
     parts.push(cyan(`[${modelDisplay}]`));

@@ -37,8 +37,8 @@ export function renderSessionLine(ctx: RenderContext): string {
   const showUsage = display?.showUsage !== false;
   const planName = showUsage ? ctx.usageData?.planName : undefined;
   const hasApiKey = !!process.env.ANTHROPIC_API_KEY;
-  const hasVertex = !!process.env.CLAUDE_CODE_USE_VERTEX;
-  const billingLabel = planName ?? (hasApiKey ? red('API') : hasVertex ? red('Vertex') : undefined);
+  // Vertex/Bedrock are handled by providerLabel (from getProviderLabel) which takes priority below.
+  const billingLabel = planName ?? (hasApiKey ? red('API') : undefined);
   const planDisplay = providerLabel ?? billingLabel;
   const modelDisplay = planDisplay ? `${model} | ${planDisplay}` : model;
 

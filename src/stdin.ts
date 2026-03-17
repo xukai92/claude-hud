@@ -111,9 +111,18 @@ export function isBedrockModelId(modelId?: string): boolean {
   return normalized.includes('anthropic.claude-');
 }
 
+export function isVertexModelId(modelId?: string): boolean {
+  if (!modelId) return false;
+  // Vertex model IDs use @ date suffix, e.g. claude-3-5-sonnet@20241022
+  return modelId.includes('@');
+}
+
 export function getProviderLabel(stdin: StdinData): string | null {
   if (isBedrockModelId(stdin.model?.id)) {
     return 'Bedrock';
+  }
+  if (isVertexModelId(stdin.model?.id) || !!process.env.CLAUDE_CODE_USE_VERTEX) {
+    return 'Vertex';
   }
   return null;
 }
