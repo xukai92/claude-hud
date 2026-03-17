@@ -91,8 +91,11 @@ export function getBufferedPercent(stdin: StdinData): number {
 export function getModelName(stdin: StdinData): string {
   const displayName = stdin.model?.display_name?.trim();
   if (displayName) {
-    // Shorten e.g. "Opus 4.6 (1M context)" → "Opus 4.6 (1M)"
-    return displayName.replace(/\s+context\b/gi, '');
+    const nameMap: Record<string, string> = {
+      'Opus 4.6 (1M context)': 'Opus 4.6 (1M)',
+      'Sonnet 4.6 (1M context)': 'Sonnet 4.6 (1M)',
+    };
+    return nameMap[displayName] ?? displayName;
   }
 
   const modelId = stdin.model?.id?.trim();
