@@ -55,9 +55,7 @@ export function renderUsageLine(ctx: RenderContext): string | null {
         : `5h: ${fiveHourDisplay}`);
 
   const sevenDayThreshold = display?.sevenDayThreshold ?? 80;
-  const syncingSuffix = ctx.usageData.apiError === 'rate-limited'
-    ? ` ${dim('(syncing...)')}`
-    : '';
+  const syncingSuffix = '';
   if (sevenDay !== null && sevenDay >= sevenDayThreshold) {
     const sevenDayDisplay = formatUsagePercent(sevenDay, colors);
     const sevenDayReset = formatResetTime(ctx.usageData.sevenDayResetAt);
