@@ -13,7 +13,7 @@ export function renderUsageLine(ctx) {
     if (getProviderLabel(ctx.stdin)) {
         return null;
     }
-    const label = dim('Usage');
+    const label = dim('U');
     if (ctx.usageData.apiUnavailable) {
         const errorHint = formatUsageError(ctx.usageData.apiError);
         return `${label} ${warning(`⚠${errorHint}`, colors)}`;
@@ -36,8 +36,8 @@ export function renderUsageLine(ctx) {
     const usageBarEnabled = display?.usageBarEnabled ?? true;
     const fiveHourPart = usageBarEnabled
         ? (fiveHourReset
-            ? `${quotaBar(fiveHour ?? 0, 10, colors)} ${fiveHourDisplay} (${fiveHourReset} / 5h)`
-            : `${quotaBar(fiveHour ?? 0, 10, colors)} ${fiveHourDisplay}`)
+            ? `${quotaBar(fiveHour ?? 0, 5, colors)} ${fiveHourDisplay} (${fiveHourReset} / 5h)`
+            : `${quotaBar(fiveHour ?? 0, 5, colors)} ${fiveHourDisplay}`)
         : (fiveHourReset
             ? `5h: ${fiveHourDisplay} (${fiveHourReset})`
             : `5h: ${fiveHourDisplay}`);
@@ -50,8 +50,8 @@ export function renderUsageLine(ctx) {
         const sevenDayReset = formatResetTime(ctx.usageData.sevenDayResetAt);
         const sevenDayPart = usageBarEnabled
             ? (sevenDayReset
-                ? `${quotaBar(sevenDay, 10, colors)} ${sevenDayDisplay} (${sevenDayReset} / 7d)`
-                : `${quotaBar(sevenDay, 10, colors)} ${sevenDayDisplay}`)
+                ? `${quotaBar(sevenDay, 5, colors)} ${sevenDayDisplay} (${sevenDayReset} / 7d)`
+                : `${quotaBar(sevenDay, 5, colors)} ${sevenDayDisplay}`)
             : (sevenDayReset
                 ? `7d: ${sevenDayDisplay} (${sevenDayReset})`
                 : `7d: ${sevenDayDisplay}`);

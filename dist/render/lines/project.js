@@ -1,5 +1,5 @@
 import { getModelName, getProviderLabel } from '../../stdin.js';
-import { cyan, dim, magenta, yellow, red } from '../colors.js';
+import { cyan, dim, magenta, red, yellow } from '../colors.js';
 export function renderProjectLine(ctx) {
     const display = ctx.config?.display;
     const parts = [];
@@ -7,9 +7,13 @@ export function renderProjectLine(ctx) {
         const model = getModelName(ctx.stdin);
         const providerLabel = getProviderLabel(ctx.stdin);
         const showUsage = display?.showUsage !== false;
-        const planName = showUsage ? ctx.usageData?.planName : undefined;
+        // planName (Max/Pro) is intentionally not shown in the model bracket — it's redundant noise.
+        // showUsage is kept here for potential future use or easy re-enabling.
+        const planName = showUsage ? ctx.usageData?.planName : undefined; // eslint-disable-line @typescript-eslint/no-unused-vars
         const hasApiKey = !!process.env.ANTHROPIC_API_KEY;
-        const billingLabel = showUsage ? (planName ?? (hasApiKey ? red('API') : undefined)) : undefined;
+        const hasVertex = !!process.env.CLAUDE_CODE_USE_VERTEX;
+        // API/Vertex labels are provider indicators, not usage data, so they ignore showUsage.
+        const billingLabel = hasApiKey ? red('API') : hasVertex ? red('Vertex') : undefined;
         const planDisplay = providerLabel ?? billingLabel;
         const modelDisplay = planDisplay ? `${model} | ${planDisplay}` : model;
         parts.push(cyan(`[${modelDisplay}]`));
@@ -53,7 +57,7 @@ export function renderProjectLine(ctx) {
                 gitParts.push(` ${statParts.join(' ')}`);
             }
         }
-        gitPart = `${magenta('git:(')}${cyan(gitParts.join(''))}${magenta(')')}`;
+        gitPart = `${magenta('(')}${cyan(gitParts.join(''))}${magenta(')')}`;
     }
     if (projectPart && gitPart) {
         parts.push(`${projectPart} ${gitPart}`);
