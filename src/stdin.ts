@@ -125,7 +125,8 @@ export function getProviderLabel(stdin: StdinData): string | null {
   if (isBedrockModelId(stdin.model?.id)) {
     return 'Bedrock';
   }
-  if (isVertexModelId(stdin.model?.id) || !!process.env.CLAUDE_CODE_USE_VERTEX) {
+  const vertexEnv = process.env.CLAUDE_CODE_USE_VERTEX;
+  if (isVertexModelId(stdin.model?.id) || vertexEnv === '1' || vertexEnv === 'true') {
     return 'Vertex';
   }
   return null;
