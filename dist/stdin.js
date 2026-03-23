@@ -75,7 +75,11 @@ export function getBufferedPercent(stdin) {
 export function getModelName(stdin) {
     const displayName = stdin.model?.display_name?.trim();
     if (displayName) {
-        return displayName;
+        const nameMap = {
+            'Opus 4.6 (1M context)': 'Opus 4.6 (1M)',
+            'Sonnet 4.6 (1M context)': 'Sonnet 4.6 (1M)',
+        };
+        return nameMap[displayName] ?? displayName;
     }
     const modelId = stdin.model?.id?.trim();
     if (!modelId) {
@@ -91,9 +95,18 @@ export function isBedrockModelId(modelId) {
     const normalized = modelId.toLowerCase();
     return normalized.includes('anthropic.claude-');
 }
+export function isVertexModelId(modelId) {
+    if (!modelId)
+        return false;
+    // Vertex model IDs use @ date suffix, e.g. claude-3-5-sonnet@20241022
+    return modelId.includes('@');
+}
 export function getProviderLabel(stdin) {
     if (isBedrockModelId(stdin.model?.id)) {
         return 'Bedrock';
+    }
+    if (isVertexModelId(stdin.model?.id) || !!process.env.CLAUDE_CODE_USE_VERTEX) {
+        return 'Vertex';
     }
     return null;
 }

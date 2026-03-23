@@ -17,7 +17,7 @@ export function renderSessionLine(ctx) {
         console.error(`[claude-hud:context] autocompactBuffer=disabled, showing raw ${rawPercent}% (buffered would be ${bufferedPercent}%)`);
     }
     const colors = ctx.config?.colors;
-    const bar = coloredBar(percent, 10, colors);
+    const bar = coloredBar(percent, 5, colors);
     const parts = [];
     const display = ctx.config?.display;
     const contextValueMode = display?.contextValue ?? 'percent';
@@ -29,14 +29,18 @@ export function renderSessionLine(ctx) {
     const showUsage = display?.showUsage !== false;
     const planName = showUsage ? ctx.usageData?.planName : undefined;
     const hasApiKey = !!process.env.ANTHROPIC_API_KEY;
-    const billingLabel = showUsage ? (planName ?? (hasApiKey ? red('API') : undefined)) : undefined;
+    // Vertex/Bedrock are handled by providerLabel (from getProviderLabel) which takes priority below.
+    const billingLabel = planName ?? (hasApiKey ? red('API') : undefined);
     const planDisplay = providerLabel ?? billingLabel;
-    const modelDisplay = planDisplay ? `${model} | ${planDisplay}` : model;
+    // Plan name is shown in the usage section; only include it in model display as fallback
+    // when the usage section won't render (e.g. API key users, usage disabled)
+    const usageWillShow = display?.showUsage !== false && ctx.usageData?.planName && !providerLabel;
+    const modelDisplay = (!usageWillShow && planDisplay) ? `${model} | ${planDisplay}` : model;
     if (display?.showModel !== false && display?.showContextBar !== false) {
-        parts.push(`${cyan(`[${modelDisplay}]`)} ${bar} ${contextValueDisplay}`);
+        parts.push(`${cyan(modelDisplay)} ${bar} ${contextValueDisplay}`);
     }
     else if (display?.showModel !== false) {
-        parts.push(`${cyan(`[${modelDisplay}]`)} ${contextValueDisplay}`);
+        parts.push(`${cyan(modelDisplay)} ${contextValueDisplay}`);
     }
     else if (display?.showContextBar !== false) {
         parts.push(`${bar} ${contextValueDisplay}`);
@@ -47,11 +51,9 @@ export function renderSessionLine(ctx) {
     // Project path + git status (SECOND)
     let projectPart = null;
     if (display?.showProject !== false && ctx.stdin.cwd) {
-        // Split by both Unix (/) and Windows (\) separators for cross-platform support
-        const segments = ctx.stdin.cwd.split(/[/\\]/).filter(Boolean);
+        const sourcePath = ctx.gitStatus?.mainRepoPath ?? ctx.stdin.cwd;
+        const segments = sourcePath.split(/[/\\]/).filter(Boolean);
         const pathLevels = ctx.config?.pathLevels ?? 1;
-        // Always join with forward slash for consistent display
-        // Handle root path (/) which results in empty segments
         const projectPath = segments.length > 0 ? segments.slice(-pathLevels).join('/') : '/';
         projectPart = yellow(projectPath);
     }
@@ -89,7 +91,7 @@ export function renderSessionLine(ctx) {
                 gitParts.push(` ${statParts.join(' ')}`);
             }
         }
-        gitPart = `${magenta('git:(')}${cyan(gitParts.join(''))}${magenta(')')}`;
+        gitPart = `${magenta('(')}${cyan(gitParts.join(''))}${magenta(')')}`;
     }
     if (projectPart && gitPart) {
         parts.push(`${projectPart} ${gitPart}`);
@@ -141,27 +143,28 @@ export function renderSessionLine(ctx) {
             const sevenDay = ctx.usageData.sevenDay;
             const effectiveUsage = Math.max(fiveHour ?? 0, sevenDay ?? 0);
             if (effectiveUsage >= usageThreshold) {
-                const syncingSuffix = ctx.usageData.apiError === 'rate-limited'
+                const syncingSuffix = (!ctx.usageData.planName && ctx.usageData.apiError === 'rate-limited')
                     ? ` ${dim('(syncing...)')}`
                     : '';
                 const fiveHourDisplay = formatUsagePercent(fiveHour, colors);
                 const fiveHourReset = formatResetTime(ctx.usageData.fiveHourResetAt);
                 const usageBarEnabled = display?.usageBarEnabled ?? true;
+                const planPrefix = planDisplay ? `${planDisplay} ` : '';
                 const fiveHourPart = usageBarEnabled
                     ? (fiveHourReset
-                        ? `${quotaBar(fiveHour ?? 0, 10, colors)} ${fiveHourDisplay} (${fiveHourReset} / 5h)`
-                        : `${quotaBar(fiveHour ?? 0, 10, colors)} ${fiveHourDisplay}`)
+                        ? `${planPrefix}${quotaBar(fiveHour ?? 0, 5, colors)} ${fiveHourDisplay} (${fiveHourReset} / 5h)`
+                        : `${planPrefix}${quotaBar(fiveHour ?? 0, 5, colors)} ${fiveHourDisplay}`)
                     : (fiveHourReset
-                        ? `5h: ${fiveHourDisplay} (${fiveHourReset})`
-                        : `5h: ${fiveHourDisplay}`);
+                        ? `${planPrefix}5h: ${fiveHourDisplay} (${fiveHourReset})`
+                        : `${planPrefix}5h: ${fiveHourDisplay}`);
                 const sevenDayThreshold = display?.sevenDayThreshold ?? 80;
                 if (sevenDay !== null && sevenDay >= sevenDayThreshold) {
                     const sevenDayDisplay = formatUsagePercent(sevenDay, colors);
                     const sevenDayReset = formatResetTime(ctx.usageData.sevenDayResetAt);
                     const sevenDayPart = usageBarEnabled
                         ? (sevenDayReset
-                            ? `${quotaBar(sevenDay, 10, colors)} ${sevenDayDisplay} (${sevenDayReset} / 7d)`
-                            : `${quotaBar(sevenDay, 10, colors)} ${sevenDayDisplay}`)
+                            ? `${quotaBar(sevenDay, 5, colors)} ${sevenDayDisplay} (${sevenDayReset} / 7d)`
+                            : `${quotaBar(sevenDay, 5, colors)} ${sevenDayDisplay}`)
                         : (sevenDayReset
                             ? `7d: ${sevenDayDisplay} (${sevenDayReset})`
                             : `7d: ${sevenDayDisplay}`);

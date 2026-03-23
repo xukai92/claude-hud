@@ -127,9 +127,9 @@ function migrateConfig(userConfig) {
     }
     return migrated;
 }
-function validateThreshold(value, max = 100) {
+function validateThreshold(value, max = 100, defaultValue = 0) {
     if (typeof value !== 'number')
-        return 0;
+        return defaultValue;
     return Math.max(0, Math.min(max, value));
 }
 function validatePositiveInt(value, defaultValue) {
@@ -210,7 +210,7 @@ export function mergeConfig(userConfig) {
             ? migrated.display.autocompactBuffer
             : DEFAULT_CONFIG.display.autocompactBuffer,
         usageThreshold: validateThreshold(migrated.display?.usageThreshold, 100),
-        sevenDayThreshold: validateThreshold(migrated.display?.sevenDayThreshold, 100),
+        sevenDayThreshold: validateThreshold(migrated.display?.sevenDayThreshold, 100, 80),
         environmentThreshold: validateThreshold(migrated.display?.environmentThreshold, 100),
     };
     const usage = {

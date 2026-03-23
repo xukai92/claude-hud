@@ -15,7 +15,7 @@ export function renderIdentityLine(ctx) {
     const contextValue = formatContextValue(ctx, percent, contextValueMode);
     const contextValueDisplay = `${getContextColor(percent, colors)}${contextValue}${RESET}`;
     let line = display?.showContextBar !== false
-        ? `${dim('C')} ${coloredBar(percent, 5, colors)} ${contextValueDisplay}`
+        ? `${dim('C')} ${coloredBar(percent, 10, colors)} ${contextValueDisplay}`
         : `${dim('C')} ${contextValueDisplay}`;
     if (display?.showTokenBreakdown !== false && percent >= 85) {
         const usage = ctx.stdin.context_window?.current_usage;

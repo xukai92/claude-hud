@@ -40,12 +40,15 @@ export function renderSessionLine(ctx: RenderContext): string {
   // Vertex/Bedrock are handled by providerLabel (from getProviderLabel) which takes priority below.
   const billingLabel = planName ?? (hasApiKey ? red('API') : undefined);
   const planDisplay = providerLabel ?? billingLabel;
-  const modelDisplay = planDisplay ? `${model} | ${planDisplay}` : model;
+  // Plan name is shown in the usage section; only include it in model display as fallback
+  // when the usage section won't render (e.g. API key users, usage disabled)
+  const usageWillShow = display?.showUsage !== false && ctx.usageData?.planName && !providerLabel;
+  const modelDisplay = (!usageWillShow && planDisplay) ? `${model} | ${planDisplay}` : model;
 
   if (display?.showModel !== false && display?.showContextBar !== false) {
-    parts.push(`${cyan(`[${modelDisplay}]`)} ${bar} ${contextValueDisplay}`);
+    parts.push(`${cyan(modelDisplay)} ${bar} ${contextValueDisplay}`);
   } else if (display?.showModel !== false) {
-    parts.push(`${cyan(`[${modelDisplay}]`)} ${contextValueDisplay}`);
+    parts.push(`${cyan(modelDisplay)} ${contextValueDisplay}`);
   } else if (display?.showContextBar !== false) {
     parts.push(`${bar} ${contextValueDisplay}`);
   } else {
@@ -161,13 +164,14 @@ export function renderSessionLine(ctx: RenderContext): string {
         const fiveHourReset = formatResetTime(ctx.usageData.fiveHourResetAt);
 
         const usageBarEnabled = display?.usageBarEnabled ?? true;
+        const planPrefix = planDisplay ? `${planDisplay} ` : '';
         const fiveHourPart = usageBarEnabled
           ? (fiveHourReset
-              ? `${quotaBar(fiveHour ?? 0, 5, colors)} ${fiveHourDisplay} (${fiveHourReset} / 5h)`
-              : `${quotaBar(fiveHour ?? 0, 5, colors)} ${fiveHourDisplay}`)
+              ? `${planPrefix}${quotaBar(fiveHour ?? 0, 5, colors)} ${fiveHourDisplay} (${fiveHourReset} / 5h)`
+              : `${planPrefix}${quotaBar(fiveHour ?? 0, 5, colors)} ${fiveHourDisplay}`)
           : (fiveHourReset
-              ? `5h: ${fiveHourDisplay} (${fiveHourReset})`
-              : `5h: ${fiveHourDisplay}`);
+              ? `${planPrefix}5h: ${fiveHourDisplay} (${fiveHourReset})`
+              : `${planPrefix}5h: ${fiveHourDisplay}`);
 
         const sevenDayThreshold = display?.sevenDayThreshold ?? 80;
         if (sevenDay !== null && sevenDay >= sevenDayThreshold) {

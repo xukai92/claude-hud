@@ -334,7 +334,10 @@ export async function getUsage(overrides = {}) {
                 if (goodData) {
                     // Preserve the backoff state in cache, but keep rendering the last successful values
                     // with a syncing hint so stale data is visible to the user.
-                    writeCache(homeDir, failureResult, now, { ...backoffOpts, lastGoodData: goodData });
+                    // Strip transient error fields before saving — staleCache.data may have had
+                    // apiError injected by withRateLimitedSyncing, which would perpetuate (syncing...) forever.
+                    const { apiError: _e, apiUnavailable: _u, ...cleanGoodData } = goodData;
+                    writeCache(homeDir, failureResult, now, { ...backoffOpts, lastGoodData: cleanGoodData });
                     return withRateLimitedSyncing(goodData);
                 }
             }
