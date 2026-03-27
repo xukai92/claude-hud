@@ -216,7 +216,13 @@ Use AskUserQuestion:
 
 Merge with existing config if the file already exists. Only write keys the user selected — don't write `false` for unselected items (defaults handle that).
 
-**If user selects nothing** (or picks "Other" and says skip/none), do not create a config file. The defaults are fine.
+**If user selects nothing** (or picks "Other" and says skip/none), write a minimal config to `~/.claude/plugins/claude-hud/config.json` (create directories if needed):
+
+```json
+{
+  "lineLayout": "compact"
+}
+```
 
 ---
 
