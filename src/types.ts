@@ -19,6 +19,7 @@ export interface StdinData {
     // Native percentage fields (Claude Code v2.1.6+)
     used_percentage?: number | null;
     remaining_percentage?: number | null;
+    cost?: number | null;
   };
 }
 

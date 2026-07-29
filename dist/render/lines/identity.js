@@ -1,4 +1,4 @@
-import { getContextPercent, getBufferedPercent, getTotalTokens } from '../../stdin.js';
+import { getContextPercent, getBufferedPercent, getTotalTokens, getSessionCost } from '../../stdin.js';
 import { coloredBar, dim, getContextColor, RESET } from '../colors.js';
 const DEBUG = process.env.DEBUG?.includes('claude-hud') || process.env.DEBUG === '*';
 export function renderIdentityLine(ctx) {
@@ -23,6 +23,12 @@ export function renderIdentityLine(ctx) {
             const input = formatTokens(usage.input_tokens ?? 0);
             const cache = formatTokens((usage.cache_creation_input_tokens ?? 0) + (usage.cache_read_input_tokens ?? 0));
             line += dim(` (in: ${input}, cache: ${cache})`);
+        }
+    }
+    if (display?.showCost) {
+        const cost = getSessionCost(ctx.stdin);
+        if (cost !== null) {
+            line += ` ${dim(`💲 ${cost}`)}`;
         }
     }
     return line;

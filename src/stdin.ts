@@ -88,6 +88,17 @@ export function getBufferedPercent(stdin: StdinData): number {
   return Math.min(100, Math.round(((totalTokens + buffer) / size) * 100));
 }
 
+export function getSessionCost(stdin: StdinData): string | null {
+  const cost = stdin.context_window?.cost;
+  if (typeof cost !== 'number' || Number.isNaN(cost)) {
+    return null;
+  }
+  if (cost < 0.01) {
+    return '<$0.01';
+  }
+  return `$${cost.toFixed(2)}`;
+}
+
 export function getModelName(stdin: StdinData): string {
   const displayName = stdin.model?.display_name?.trim();
   if (displayName) {

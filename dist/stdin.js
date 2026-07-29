@@ -72,6 +72,16 @@ export function getBufferedPercent(stdin) {
     const buffer = size * AUTOCOMPACT_BUFFER_PERCENT * scale;
     return Math.min(100, Math.round(((totalTokens + buffer) / size) * 100));
 }
+export function getSessionCost(stdin) {
+    const cost = stdin.context_window?.cost;
+    if (typeof cost !== 'number' || Number.isNaN(cost)) {
+        return null;
+    }
+    if (cost < 0.01) {
+        return '<$0.01';
+    }
+    return `$${cost.toFixed(2)}`;
+}
 export function getModelName(stdin) {
     const displayName = stdin.model?.display_name?.trim();
     if (displayName) {
@@ -105,7 +115,8 @@ export function getProviderLabel(stdin) {
     if (isBedrockModelId(stdin.model?.id)) {
         return 'Bedrock';
     }
-    if (isVertexModelId(stdin.model?.id) || !!process.env.CLAUDE_CODE_USE_VERTEX) {
+    const vertexEnv = process.env.CLAUDE_CODE_USE_VERTEX;
+    if (isVertexModelId(stdin.model?.id) || vertexEnv === '1' || vertexEnv === 'true') {
         return 'Vertex';
     }
     return null;

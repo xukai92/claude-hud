@@ -56,6 +56,7 @@ test('loadConfig returns valid config structure', async () => {
   assert.equal(typeof config.display.showAgents, 'boolean');
   assert.equal(typeof config.display.showTodos, 'boolean');
   assert.equal(typeof config.display.showSessionName, 'boolean');
+  assert.equal(typeof config.display.showCost, 'boolean');
   assert.equal(typeof config.colors, 'object');
   assert.equal(typeof config.colors.context, 'string');
   assert.equal(typeof config.colors.usage, 'string');
@@ -86,6 +87,17 @@ test('mergeConfig defaults showSessionName to false', () => {
 test('mergeConfig preserves explicit showSessionName=true', () => {
   const config = mergeConfig({ display: { showSessionName: true } });
   assert.equal(config.display.showSessionName, true);
+});
+
+test('mergeConfig defaults showCost to false', () => {
+  const config = mergeConfig({});
+  assert.equal(config.display.showCost, false);
+  assert.equal(DEFAULT_CONFIG.display.showCost, false);
+});
+
+test('mergeConfig preserves explicit showCost=true', () => {
+  const config = mergeConfig({ display: { showCost: true } });
+  assert.equal(config.display.showCost, true);
 });
 
 test('getConfigPath respects CLAUDE_CONFIG_DIR', async () => {

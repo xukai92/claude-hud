@@ -17,6 +17,7 @@ export interface StdinData {
         } | null;
         used_percentage?: number | null;
         remaining_percentage?: number | null;
+        cost?: number | null;
     };
 }
 export interface ToolEntry {
