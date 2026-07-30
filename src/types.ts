@@ -3,6 +3,7 @@ import type { GitStatus } from './git.js';
 
 export interface StdinData {
   transcript_path?: string;
+  session_id?: string;
   cwd?: string;
   model?: {
     id?: string;
@@ -19,7 +20,10 @@ export interface StdinData {
     // Native percentage fields (Claude Code v2.1.6+)
     used_percentage?: number | null;
     remaining_percentage?: number | null;
-    cost?: number | null;
+  };
+  cost?: {
+    total_cost_usd?: number;
+    total_duration_ms?: number;
   };
 }
 
@@ -86,6 +90,7 @@ export interface RenderContext {
   sessionDuration: string;
   gitStatus: GitStatus | null;
   usageData: UsageData | null;
+  monthlyCost: number | null;
   config: HudConfig;
   extraLabel: string | null;
 }

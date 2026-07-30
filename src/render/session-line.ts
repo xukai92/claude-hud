@@ -1,6 +1,6 @@
 import type { RenderContext } from '../types.js';
 import { isLimitReached } from '../types.js';
-import { getContextPercent, getBufferedPercent, getModelName, getProviderLabel, getTotalTokens, getSessionCost } from '../stdin.js';
+import { getContextPercent, getBufferedPercent, getModelName, getProviderLabel, getTotalTokens, getSessionCost, formatCost } from '../stdin.js';
 import { getOutputSpeed } from '../speed-tracker.js';
 import { coloredBar, critical, cyan, dim, magenta, red, warning, yellow, getContextColor, getQuotaColor, quotaBar, RESET } from './colors.js';
 
@@ -196,7 +196,10 @@ export function renderSessionLine(ctx: RenderContext): string {
   if (display?.showCost) {
     const cost = getSessionCost(ctx.stdin);
     if (cost !== null) {
-      parts.push(dim(`💲 ${cost}`));
+      const monthlyStr = (ctx.monthlyCost != null && ctx.monthlyCost >= 0.01)
+        ? dim(` (~${formatCost(ctx.monthlyCost)}/mo)`)
+        : '';
+      parts.push(`${yellow(cost)}${monthlyStr}`);
     }
   }
 
