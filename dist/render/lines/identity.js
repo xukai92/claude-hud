@@ -1,4 +1,5 @@
-import { getContextPercent, getBufferedPercent, getTotalTokens, getSessionCost } from '../../stdin.js';
+import { getContextPercent, getBufferedPercent, getTotalTokens } from '../../stdin.js';
+import { formatCostDisplay } from '../cost-display.js';
 import { coloredBar, dim, getContextColor, RESET } from '../colors.js';
 const DEBUG = process.env.DEBUG?.includes('claude-hud') || process.env.DEBUG === '*';
 export function renderIdentityLine(ctx) {
@@ -26,9 +27,9 @@ export function renderIdentityLine(ctx) {
         }
     }
     if (display?.showCost) {
-        const cost = getSessionCost(ctx.stdin);
-        if (cost !== null) {
-            line += ` ${dim(`💲 ${cost}`)}`;
+        const costDisplay = formatCostDisplay(ctx);
+        if (costDisplay !== null) {
+            line += ` ${costDisplay}`;
         }
     }
     return line;

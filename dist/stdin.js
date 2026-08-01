@@ -72,15 +72,17 @@ export function getBufferedPercent(stdin) {
     const buffer = size * AUTOCOMPACT_BUFFER_PERCENT * scale;
     return Math.min(100, Math.round(((totalTokens + buffer) / size) * 100));
 }
-export function getSessionCost(stdin) {
-    const cost = stdin.context_window?.cost;
-    if (typeof cost !== 'number' || Number.isNaN(cost)) {
+export function formatCost(usd) {
+    if (usd == null || !Number.isFinite(usd) || usd < 0) {
         return null;
     }
-    if (cost < 0.01) {
+    if (usd < 0.01) {
         return '<$0.01';
     }
-    return `$${cost.toFixed(2)}`;
+    return `$${usd.toFixed(2)}`;
+}
+export function getSessionCost(stdin) {
+    return formatCost(stdin.cost?.total_cost_usd);
 }
 export function getModelName(stdin) {
     const displayName = stdin.model?.display_name?.trim();

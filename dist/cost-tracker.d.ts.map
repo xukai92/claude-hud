@@ -1,0 +1,1 @@
+{"version":3,"file":"cost-tracker.d.ts","sourceRoot":"","sources":["../src/cost-tracker.ts"],"names":[],"mappings":"AAKA,MAAM,MAAM,eAAe,GAAG;IAC5B,OAAO,EAAE,MAAM,MAAM,CAAC;IACtB,GAAG,EAAE,MAAM,IAAI,CAAC;CACjB,CAAC;AAuDF,wBAAgB,uBAAuB,CACrC,SAAS,EAAE,MAAM,GAAG,SAAS,EAC7B,OAAO,EAAE,MAAM,GAAG,SAAS,EAC3B,SAAS,GAAE,OAAO,CAAC,eAAe,CAAM,GACvC,MAAM,GAAG,IAAI,CA+Df"}

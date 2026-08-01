@@ -1,5 +1,6 @@
 import type { RenderContext } from '../../types.js';
-import { getContextPercent, getBufferedPercent, getTotalTokens, getSessionCost, formatCost } from '../../stdin.js';
+import { getContextPercent, getBufferedPercent, getTotalTokens } from '../../stdin.js';
+import { formatCostDisplay } from '../cost-display.js';
 import { coloredBar, dim, getContextColor, RESET } from '../colors.js';
 
 const DEBUG = process.env.DEBUG?.includes('claude-hud') || process.env.DEBUG === '*';
@@ -34,12 +35,9 @@ export function renderIdentityLine(ctx: RenderContext): string {
   }
 
   if (display?.showCost) {
-    const cost = getSessionCost(ctx.stdin);
-    if (cost !== null) {
-      const monthlyStr = (ctx.monthlyCost != null && ctx.monthlyCost >= 0.01)
-        ? dim(` (~${formatCost(ctx.monthlyCost)}/mo)`)
-        : '';
-      line += ` ${dim('💲')} ${cost}${monthlyStr}`;
+    const costDisplay = formatCostDisplay(ctx);
+    if (costDisplay !== null) {
+      line += ` ${costDisplay}`;
     }
   }
 

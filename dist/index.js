@@ -6,6 +6,7 @@ import { getGitStatus } from './git.js';
 import { getUsage } from './usage-api.js';
 import { loadConfig } from './config.js';
 import { parseExtraCmdArg, runExtraCmd } from './extra-cmd.js';
+import { updateAndGetMonthlyCost } from './cost-tracker.js';
 import { fileURLToPath } from 'node:url';
 import { realpathSync } from 'node:fs';
 export async function main(overrides = {}) {
@@ -18,6 +19,7 @@ export async function main(overrides = {}) {
         loadConfig,
         parseExtraCmdArg,
         runExtraCmd,
+        updateAndGetMonthlyCost,
         render,
         now: () => Date.now(),
         log: console.log,
@@ -47,6 +49,9 @@ export async function main(overrides = {}) {
             : null;
         const extraCmd = deps.parseExtraCmdArg();
         const extraLabel = extraCmd ? await deps.runExtraCmd(extraCmd) : null;
+        const monthlyCost = config.display.showCost
+            ? deps.updateAndGetMonthlyCost(stdin.session_id, stdin.cost?.total_cost_usd)
+            : null;
         const sessionDuration = formatSessionDuration(transcript.sessionStart, deps.now);
         const ctx = {
             stdin,
@@ -58,6 +63,7 @@ export async function main(overrides = {}) {
             sessionDuration,
             gitStatus,
             usageData,
+            monthlyCost,
             config,
             extraLabel,
         };
