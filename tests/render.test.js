@@ -35,13 +35,14 @@ function baseContext() {
     sessionDuration: '',
     gitStatus: null,
     usageData: null,
+    monthlyCost: null,
     config: {
       lineLayout: 'compact',
       showSeparators: false,
       pathLevels: 1,
       elementOrder: ['project', 'context', 'usage', 'environment', 'tools', 'agents', 'todos'],
       gitStatus: { enabled: true, showDirty: true, showAheadBehind: false, showFileStats: false },
-      display: { showModel: true, showProject: true, showContextBar: true, contextValue: 'percent', showConfigCounts: true, showDuration: true, showSpeed: false, showTokenBreakdown: true, showUsage: true, usageBarEnabled: false, showTools: true, showAgents: true, showTodos: true, showSessionName: false, autocompactBuffer: 'enabled', usageThreshold: 0, sevenDayThreshold: 80, environmentThreshold: 0 },
+      display: { showModel: true, showProject: true, showContextBar: true, contextValue: 'percent', showConfigCounts: true, showDuration: true, showSpeed: false, showTokenBreakdown: true, showUsage: true, usageBarEnabled: false, showTools: true, showAgents: true, showTodos: true, showSessionName: false, showCost: false, autocompactBuffer: 'enabled', usageThreshold: 0, sevenDayThreshold: 80, environmentThreshold: 0 },
       colors: {
         context: 'green',
         usage: 'brightBlue',
@@ -1189,4 +1190,44 @@ test('render compact layout keeps activity lines even when elementOrder omits th
 
   assert.ok(output.includes('Read'), 'compact mode should keep tools visible');
   assert.ok(output.includes('todo-marker'), 'compact mode should keep todos visible');
+});
+
+test('renderSessionLine shows cost when showCost is true', () => {
+  const ctx = baseContext();
+  ctx.stdin.cost = { total_cost_usd: 1.23 };
+  ctx.config.display.showCost = true;
+  ctx.monthlyCost = null;
+  const line = renderSessionLine(ctx);
+  const plain = stripAnsi(line);
+  assert.ok(plain.includes('$1.23'), 'should display session cost');
+});
+
+test('renderSessionLine shows monthly total when monthlyCost >= 0.01', () => {
+  const ctx = baseContext();
+  ctx.stdin.cost = { total_cost_usd: 1.23 };
+  ctx.config.display.showCost = true;
+  ctx.monthlyCost = 18.07;
+  const line = renderSessionLine(ctx);
+  const plain = stripAnsi(line);
+  assert.ok(plain.includes('$18.07'), 'should display monthly total');
+  assert.ok(plain.includes('mtd'), 'should label as mtd');
+});
+
+test('renderSessionLine suppresses monthly when monthlyCost < 0.01', () => {
+  const ctx = baseContext();
+  ctx.stdin.cost = { total_cost_usd: 0.005 };
+  ctx.config.display.showCost = true;
+  ctx.monthlyCost = 0.005;
+  const line = renderSessionLine(ctx);
+  const plain = stripAnsi(line);
+  assert.ok(!plain.includes('mtd'), 'should not show mtd for sub-cent monthly');
+});
+
+test('renderSessionLine hides cost when showCost is false', () => {
+  const ctx = baseContext();
+  ctx.stdin.cost = { total_cost_usd: 5.00 };
+  ctx.config.display.showCost = false;
+  const line = renderSessionLine(ctx);
+  const plain = stripAnsi(line);
+  assert.ok(!plain.includes('$5.00'), 'should not display cost when disabled');
 });

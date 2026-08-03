@@ -6,6 +6,7 @@ import { getGitStatus } from './git.js';
 import { getUsage } from './usage-api.js';
 import { loadConfig } from './config.js';
 import { parseExtraCmdArg, runExtraCmd } from './extra-cmd.js';
+import { updateAndGetMonthlyCost } from './cost-tracker.js';
 import type { RenderContext } from './types.js';
 import { fileURLToPath } from 'node:url';
 import { realpathSync } from 'node:fs';
@@ -19,6 +20,7 @@ export type MainDeps = {
   loadConfig: typeof loadConfig;
   parseExtraCmdArg: typeof parseExtraCmdArg;
   runExtraCmd: typeof runExtraCmd;
+  updateAndGetMonthlyCost: typeof updateAndGetMonthlyCost;
   render: typeof render;
   now: () => number;
   log: (...args: unknown[]) => void;
@@ -34,6 +36,7 @@ export async function main(overrides: Partial<MainDeps> = {}): Promise<void> {
     loadConfig,
     parseExtraCmdArg,
     runExtraCmd,
+    updateAndGetMonthlyCost,
     render,
     now: () => Date.now(),
     log: console.log,
@@ -71,6 +74,10 @@ export async function main(overrides: Partial<MainDeps> = {}): Promise<void> {
     const extraCmd = deps.parseExtraCmdArg();
     const extraLabel = extraCmd ? await deps.runExtraCmd(extraCmd) : null;
 
+    const monthlyCost = config.display.showCost
+      ? deps.updateAndGetMonthlyCost(stdin.session_id, stdin.cost?.total_cost_usd)
+      : null;
+
     const sessionDuration = formatSessionDuration(transcript.sessionStart, deps.now);
 
     const ctx: RenderContext = {
@@ -83,6 +90,7 @@ export async function main(overrides: Partial<MainDeps> = {}): Promise<void> {
       sessionDuration,
       gitStatus,
       usageData,
+      monthlyCost,
       config,
       extraLabel,
     };

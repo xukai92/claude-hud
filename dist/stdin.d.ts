@@ -3,6 +3,8 @@ export declare function readStdin(): Promise<StdinData | null>;
 export declare function getTotalTokens(stdin: StdinData): number;
 export declare function getContextPercent(stdin: StdinData): number;
 export declare function getBufferedPercent(stdin: StdinData): number;
+export declare function formatCost(usd: number | null | undefined): string | null;
+export declare function getSessionCost(stdin: StdinData): string | null;
 export declare function getModelName(stdin: StdinData): string;
 export declare function isBedrockModelId(modelId?: string): boolean;
 export declare function isVertexModelId(modelId?: string): boolean;

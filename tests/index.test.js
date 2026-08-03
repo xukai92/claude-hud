@@ -167,3 +167,55 @@ test('main includes usageData in render context', async () => {
 
   assert.deepEqual(renderedContext?.usageData, mockUsageData);
 });
+
+test('main includes monthlyCost in render context when showCost is enabled', async () => {
+  let renderedContext;
+
+  await main({
+    readStdin: async () => ({
+      model: { display_name: 'Opus' },
+      session_id: 'test-session-123',
+      cost: { total_cost_usd: 1.50 },
+      context_window: { context_window_size: 100, current_usage: { input_tokens: 10 } },
+    }),
+    parseTranscript: async () => ({ tools: [], agents: [], todos: [] }),
+    countConfigs: async () => ({ claudeMdCount: 0, rulesCount: 0, mcpCount: 0, hooksCount: 0 }),
+    getGitBranch: async () => null,
+    getUsage: async () => null,
+    loadConfig: async () => ({
+      ...( await import('../dist/config.js') ).DEFAULT_CONFIG,
+      display: { ...( await import('../dist/config.js') ).DEFAULT_CONFIG.display, showCost: true },
+    }),
+    updateAndGetMonthlyCost: () => 25.00,
+    render: (ctx) => {
+      renderedContext = ctx;
+    },
+  });
+
+  assert.equal(renderedContext?.monthlyCost, 25.00);
+});
+
+test('main sets monthlyCost to null when showCost is disabled', async () => {
+  let renderedContext;
+  const { DEFAULT_CONFIG } = await import('../dist/config.js');
+
+  await main({
+    readStdin: async () => ({
+      model: { display_name: 'Opus' },
+      session_id: 'test-session-456',
+      cost: { total_cost_usd: 1.50 },
+      context_window: { context_window_size: 100, current_usage: { input_tokens: 10 } },
+    }),
+    parseTranscript: async () => ({ tools: [], agents: [], todos: [] }),
+    countConfigs: async () => ({ claudeMdCount: 0, rulesCount: 0, mcpCount: 0, hooksCount: 0 }),
+    getGitStatus: async () => null,
+    getUsage: async () => null,
+    loadConfig: async () => ({ ...DEFAULT_CONFIG, display: { ...DEFAULT_CONFIG.display, showCost: false } }),
+    updateAndGetMonthlyCost: () => { throw new Error('should not be called'); },
+    render: (ctx) => {
+      renderedContext = ctx;
+    },
+  });
+
+  assert.equal(renderedContext?.monthlyCost, null);
+});

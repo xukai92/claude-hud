@@ -88,6 +88,20 @@ export function getBufferedPercent(stdin: StdinData): number {
   return Math.min(100, Math.round(((totalTokens + buffer) / size) * 100));
 }
 
+export function formatCost(usd: number | null | undefined): string | null {
+  if (usd == null || !Number.isFinite(usd) || usd < 0) {
+    return null;
+  }
+  if (usd < 0.01) {
+    return '<$0.01';
+  }
+  return `$${usd.toFixed(2)}`;
+}
+
+export function getSessionCost(stdin: StdinData): string | null {
+  return formatCost(stdin.cost?.total_cost_usd);
+}
+
 export function getModelName(stdin: StdinData): string {
   const displayName = stdin.model?.display_name?.trim();
   if (displayName) {

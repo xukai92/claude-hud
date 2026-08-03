@@ -2,6 +2,7 @@ import type { HudConfig } from './config.js';
 import type { GitStatus } from './git.js';
 export interface StdinData {
     transcript_path?: string;
+    session_id?: string;
     cwd?: string;
     model?: {
         id?: string;
@@ -17,6 +18,10 @@ export interface StdinData {
         } | null;
         used_percentage?: number | null;
         remaining_percentage?: number | null;
+    };
+    cost?: {
+        total_cost_usd?: number;
+        total_duration_ms?: number;
     };
 }
 export interface ToolEntry {
@@ -73,6 +78,7 @@ export interface RenderContext {
     sessionDuration: string;
     gitStatus: GitStatus | null;
     usageData: UsageData | null;
+    monthlyCost: number | null;
     config: HudConfig;
     extraLabel: string | null;
 }

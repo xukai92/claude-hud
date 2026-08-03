@@ -204,6 +204,7 @@ Use AskUserQuestion:
   - "Agents & Todos" — Shows subagent status and todo progress
   - "Session info" — Shows session duration and config counts (CLAUDE.md, rules, MCPs)
   - "Session name" — Shows session slug or custom title from /rename
+  - "Session cost" — Shows session cost and month-to-date total ($1.23 ($18.07 mtd))
 
 **If user selects any options**, write `~/.claude/plugins/claude-hud/config.json` (create directories if needed):
 
@@ -213,6 +214,7 @@ Use AskUserQuestion:
 | Agents & Todos | `display.showAgents: true, display.showTodos: true` |
 | Session info | `display.showDuration: true, display.showConfigCounts: true` |
 | Session name | `display.showSessionName: true` |
+| Session cost | `display.showCost: true` |
 
 Merge with existing config if the file already exists. Only write keys the user selected — don't write `false` for unselected items (defaults handle that).
 

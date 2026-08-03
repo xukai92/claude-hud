@@ -2,6 +2,7 @@ import type { RenderContext } from '../types.js';
 import { isLimitReached } from '../types.js';
 import { getContextPercent, getBufferedPercent, getModelName, getProviderLabel, getTotalTokens } from '../stdin.js';
 import { getOutputSpeed } from '../speed-tracker.js';
+import { formatCostDisplay } from './cost-display.js';
 import { coloredBar, critical, cyan, dim, magenta, red, warning, yellow, getContextColor, getQuotaColor, quotaBar, RESET } from './colors.js';
 
 const DEBUG = process.env.DEBUG?.includes('claude-hud') || process.env.DEBUG === '*';
@@ -189,6 +190,14 @@ export function renderSessionLine(ctx: RenderContext): string {
           parts.push(`${fiveHourPart}${syncingSuffix}`);
         }
       }
+    }
+  }
+
+  // Session cost
+  if (display?.showCost) {
+    const costDisplay = formatCostDisplay(ctx);
+    if (costDisplay !== null) {
+      parts.push(costDisplay);
     }
   }
 
